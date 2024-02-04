@@ -134,8 +134,7 @@ Please write your answer in full sentences.
 
 ### Bootstrap
 
-We will investigate numerically the probability that a bootstrap sample of size n = 100 contains the jth observation. Here j = 4. We repeatedly create bootstrap samples, and each time
-we record whether or not the fourth observation is contained in the bootstrap sample.
+We will investigate numerically the probability that a bootstrap sample of size n = 100 contains the jth observation. Here j = 4. We repeatedly create bootstrap samples, and each time we record whether or not the fourth observation is contained in the bootstrap sample.
 
 Here is the code to get you going
 ```{r,echo =TRUE,eval=FALSE}
@@ -152,7 +151,7 @@ Comment on the results obtained.
 Your code:
 
 ```{r,echo=TRUE}
-#
+library(boot)
 #
 ```
 
@@ -183,8 +182,14 @@ used to generate the data in equation form.
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+data_1 = data.frame(y,x)
+set.seed(18)
+cv.error.10 <- rep(0, 10)
+for (i in 1:10) {
+  glm.fit <- glm(y ~ poly(x, i), data = data_1)
+  cv.error.10[i] <- cv.glm(data_1, glm.fit, K = 10)$delta[1]
+}
+cv.error.10
 ```
 
 Your answer:
@@ -202,7 +207,8 @@ Please write your answer in full sentences.
 Your code:
 
 ```{r,echo=TRUE}
-#
+ggplot(aes(x = x, y = y), data = data_1) +
+  geom_point()
 #
 ```
 
@@ -228,8 +234,19 @@ to create a single data set containing both $X$ and $Y$ .
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+set.seed(19)
+glm.fit <- glm(y ~ x, data = data_1)
+cv.err <- cv.glm(data = data_1, glm.fit)
+cv.err$delta
+```
+```{r}
+set.seed(19)
+cv.error <- rep(0, 10)
+for (i in 1:10) {
+  glm.fit <- glm(y ~ poly(x, i), data = data_1)
+  cv.error[i] <- cv.glm(data_1, glm.fit)$delta[1]
+}
+cv.error
 ```
 
 Your answer:
@@ -247,7 +264,13 @@ Are your results the same as what you got in (c)? Why?
 Your code:
 
 ```{r,echo=TRUE}
-#
+set.seed(20)
+cv.error <- rep(0, 10)
+for (i in 1:10) {
+  glm.fit <- glm(y ~ poly(x, i), data = data_1)
+  cv.error[i] <- cv.glm(data_1, glm.fit)$delta[1]
+}
+cv.error
 #
 ```
 
@@ -271,7 +294,7 @@ Your code:
 Your answer:
 
 ~~~
-Please write your answer in full sentences.
+When i = 5 has the smallest LOOCV error.
 
 
 ~~~
@@ -307,8 +330,9 @@ In Chapter 4, we used logistic regression to predict the probability of default 
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+attach(Default)
+fit_1 = glm(default ~ income + balance, data = Default, family = "binomial")
+fit_1
 ```
 
 Your answer:
@@ -327,8 +351,9 @@ i. Split the sample set into a training set and a validation set.
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+dim(Default)
+set.seed(1)
+train <- sample(10000, 5000)
 ```
 
 Your answer:
@@ -344,7 +369,8 @@ ii. Fit a multiple logistic regression model using only the training observation
 Your code:
 
 ```{r,echo=TRUE}
-#
+fit_2 = glm(default ~ income + balance, data = Default, family = "binomial", subset = train)
+fit_2
 #
 ```
 
@@ -363,7 +389,8 @@ iii. Obtain a prediction of default status for each individual in the validation
 Your code:
 
 ```{r,echo=TRUE}
-#
+pred_2 = predict(fit_2, Default[-train])
+pred_2_b = ifelse(pred_2 > 0.5, "Yes", "No")
 #
 ```
 
@@ -381,15 +408,15 @@ iv. Compute the validation set error, which is the fraction of the observations 
 Your code:
 
 ```{r,echo=TRUE}
-#
+mean(pred_2_b != Default[-train]$default)
 #
 ```
 
 Your answer:
 
 ~~~
-Please write your answer in full sentences.
 
+validation set error is 0.0275
 
 ~~~
 
@@ -400,8 +427,12 @@ Please write your answer in full sentences.
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+set.seed(3)
+train_3 <- sample(10000, 5000)
+fit_3 = glm(default ~ income + balance, data = Default, family = "binomial", subset = train_3)
+pred_3 = predict(fit_3, Default[-train_3])
+pred_3_b = ifelse(pred_3 > 0.5, "Yes", "No")
+mean(na.omit(pred_3_b != Default[-train_3]$default))
 ```
 
 Your answer:
